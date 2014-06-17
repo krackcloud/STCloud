@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 15-jun-2014 1:34:04 by Hibernate Tools 3.2.1.GA -->
+<hibernate-mapping>
+    <class name="com.siat.stcloud.pojos.Usuario" table="usuario" catalog="stcloud">
+        <id name="idUsuario" type="java.lang.Integer">
+            <column name="idUsuario" />
+            <generator class="identity" />
+        </id>
+        <property name="usrNombre" type="string">
+            <column name="usr_nombre" length="50" />
+        </property>
+        <property name="usrGenero" type="string">
+            <column name="usr_genero" length="2" />
+        </property>
+        <property name="usrFechaNacimiento" type="date">
+            <column name="usr_fechaNacimiento" length="10" />
+        </property>
+        <property name="usrEmail" type="string">
+            <column name="usr_email" length="50" />
+        </property>
+        <property name="usrUsuario" type="string">
+            <column name="usr_usuario" length="30" />
+        </property>
+        <property name="usrContrasenia" type="string">
+            <column name="usr_contrasenia" length="800" />
+        </property>
+        <property name="usrPrivilegios" type="string">
+            <column name="usr_privilegios" length="13" />
+        </property>
+        <set name="carpetas" inverse="true">
+            <key>
+                <column name="idUsuario" />
+            </key>
+            <one-to-many class="com.siat.stcloud.pojos.Carpeta" />
+        </set>
+        <set name="usuarioGrupos" inverse="true">
+            <key>
+                <column name="usrgrp_idUsuario" />
+            </key>
+            <one-to-many class="com.siat.stcloud.pojos.UsuarioGrupo" />
+        </set>
+        <set name="grupos" inverse="true">
+            <key>
+                <column name="idUsuarioAdmin" />
+            </key>
+            <one-to-many class="com.siat.stcloud.pojos.Grupo" />
+        </set>
+    </class>
+</hibernate-mapping>

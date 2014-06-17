@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 15-jun-2014 1:34:04 by Hibernate Tools 3.2.1.GA -->
+<hibernate-mapping>
+    <class name="com.siat.stcloud.pojos.Grupo" table="grupo" catalog="stcloud">
+        <id name="idGrupo" type="java.lang.Integer">
+            <column name="idGrupo" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="usuario" class="com.siat.stcloud.pojos.Usuario" fetch="select">
+            <column name="idUsuarioAdmin" />
+        </many-to-one>
+        <property name="grpNombre" type="string">
+            <column name="grp_nombre" length="30" not-null="true" />
+        </property>
+        <property name="grpDescripcion" type="string">
+            <column name="grp_descripcion" length="100" />
+        </property>
+        <property name="grpFechaCreacion" type="timestamp">
+            <column name="grp_fechaCreacion" length="19" not-null="true" />
+        </property>
+        <set name="carpetas" inverse="true">
+            <key>
+                <column name="idGrupo" />
+            </key>
+            <one-to-many class="com.siat.stcloud.pojos.Carpeta" />
+        </set>
+        <set name="usuarioGrupos" inverse="true">
+            <key>
+                <column name="usrgrp_idGrupo" />
+            </key>
+            <one-to-many class="com.siat.stcloud.pojos.UsuarioGrupo" />
+        </set>
+    </class>
+</hibernate-mapping>
