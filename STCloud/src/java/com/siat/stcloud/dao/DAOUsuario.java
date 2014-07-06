@@ -6,6 +6,7 @@ package com.siat.stcloud.dao;
 
 import com.siat.stcloud.interfaces.InterfaceUsuario;
 import com.siat.stcloud.pojos.Usuario;
+import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -30,7 +31,10 @@ public class DAOUsuario implements InterfaceUsuario {
 
     @Override
     public List<Usuario> list(Session session) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String hql = "from Usuario";
+        Query query = session.createQuery(hql);
+        List<Usuario> usuarios = (List<Usuario>) query.list();
+        return usuarios;
     }
 
     @Override

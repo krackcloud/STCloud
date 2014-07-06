@@ -7,27 +7,28 @@
 
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link href="/STCloud/Resources/css/default.css" rel="stylesheet" type="text/css" />
-        <link href="/STCloud/Resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+        <link href="#{request.contextPath}/Resources/css/default.css" rel="stylesheet" type="text/css" />
+        <link href="#{request.contextPath}/Resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
         <title>SIAT Cloud</title>
     </h:head>
     <h:body>
         <div id="top" class="top">
+            <h1>STCloud Storage In Cloud</h1>
             <h:form>
                 <p:megaMenu>
                     <p:submenu label="SIAT Cloud">
                         <p:column>
                             <p:submenu label="Ficheros">
-                                <p:menuitem value="Subir Archivo" url="#" />
-                                <p:menuitem value="Crear Carpeta" url="#"/>                    
+                                <p:menuitem value="Subir Archivo" url="#" icon="ui-icon-plus"/>
+                                <p:menuitem value="Crear Carpeta" url="#" icon="ui-icon-folder-open"/>                    
                             </p:submenu>
                         </p:column>
                     </p:submenu>
                     <p:submenu label="Opciones">
                         <p:column>
                             <p:submenu label="Administracion">
-                                <p:menuitem value="Administrar Cuenta" url="#" />
-                                <p:menuitem value="Cambiar Contraseña" url="#"/>                    
+                                <p:menuitem value="Administrar Cuenta" url="#" icon="ui-icon-gear"/>
+                                <p:menuitem value="Cambiar Contraseña" url="#" icon="ui-icon-pencil"/>                    
                             </p:submenu>
                         </p:column>
                     </p:submenu>
@@ -36,9 +37,15 @@
         </div>
 
         <div id="content" class="center_content">
-            <ui:insert name="content">Content</ui:insert>
+            <ui:insert name="content"></ui:insert>
         </div>
 
+        <div id="bottom" class="bottom">
+            <ui:insert name="bottom"></ui:insert>
+            <hr/>
+            SIAT 2014 All Rights Reserved
+
+        </div>
     </h:body>
 
 </html>
