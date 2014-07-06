@@ -13,24 +13,26 @@
     </h:head>
     <h:body>
         <div id="top" class="top">
-            <p:megaMenu>
-                 <p:submenu label="SIAT Cloud">
-                    <p:column>
-                        <p:submenu label="Ficheros">
-                            <p:menuitem value="Subir Archivo" url="#" />
-                            <p:menuitem value="Crear Carpeta" url="#"/>                    
-                        </p:submenu>
-                    </p:column>
-                </p:submenu>
-                <p:submenu label="Opciones">
-                    <p:column>
-                        <p:submenu label="Administracion">
-                            <p:menuitem value="Administrar Cuenta" url="#" />
-                            <p:menuitem value="Cambiar Contraseña" url="#"/>                    
-                        </p:submenu>
-                    </p:column>
-                </p:submenu>
-            </p:megaMenu>
+            <h:form>
+                <p:megaMenu>
+                    <p:submenu label="SIAT Cloud">
+                        <p:column>
+                            <p:submenu label="Ficheros">
+                                <p:menuitem value="Subir Archivo" url="#" />
+                                <p:menuitem value="Crear Carpeta" url="#"/>                    
+                            </p:submenu>
+                        </p:column>
+                    </p:submenu>
+                    <p:submenu label="Opciones">
+                        <p:column>
+                            <p:submenu label="Administracion">
+                                <p:menuitem value="Administrar Cuenta" url="#" />
+                                <p:menuitem value="Cambiar Contraseña" url="#"/>                    
+                            </p:submenu>
+                        </p:column>
+                    </p:submenu>
+                </p:megaMenu>
+            </h:form>
         </div>
 
         <div id="content" class="center_content">

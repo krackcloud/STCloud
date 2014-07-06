@@ -4,6 +4,15 @@
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
+    <context-param>
+        <param-name>primefaces.PUBLIC_CAPTCHA_KEY</param-name>
+        <param-value>6LcHovUSAAAAACGOAD4krNBgavRIb5rNCStYjj1J</param-value>
+    </context-param>  
+    <context-param>
+        <param-name>primefaces.PRIVATE_CAPTCHA_KEY</param-name>
+        <param-value>6LcHovUSAAAAAJeIAhcgzsEL0i9NGtkCh8m_O4SF</param-value>
+    </context-param>    
+        
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
@@ -14,17 +23,17 @@
         <url-pattern>/faces/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-	<servlet-name>Faces Servlet</servlet-name>
-	<url-pattern>*.jsf</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-	<servlet-name>Faces Servlet</servlet-name>
-	<url-pattern>*.faces</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-	<servlet-name>Faces Servlet</servlet-name>
-	<url-pattern>*.xhtml</url-pattern>
-</servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.jsf</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.faces</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

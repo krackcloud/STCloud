@@ -5,11 +5,12 @@
     Description:
         Purpose of the stylesheet follows.
 */
-
-body
+#cuerpo
 {
-    background-color: #8BB9C7;
     font-family: sans-serif;
+    background-image: url("/STCloud/stlogo.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
 }
   
 .contenedorLogin
