@@ -1,7 +1,10 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
 
     <body>
 
@@ -11,6 +14,42 @@
             </ui:define>
             <ui:define name="content">
                 Bienvenido #{user1.user}<hr/>
+                <h1>Mis usuarios</h1>
+                <h:form>
+                    <p:growl id="msg" showDetail="true" sticky="false" />
+                    <p:dataTable id="tablaLista" var="item" value="#{user.listaUsuarios}" paginator="true" rows="5" >
+                        <f:facet name="header">
+                            Lista                            
+                        </f:facet>
+                        
+                        <p:column headerText="ID" >
+                            <h:outputText value="#{item.idUsuario}" />
+                        </p:column>
+                        <p:column headerText="Nombre" >
+                            <h:outputText value="#{item.usrNombre}" />
+                            
+                        </p:column>
+                        <p:column headerText="Fecha de Nacimiento" >
+                            <h:outputText value="#{item.usrFechaNacimiento}" />
+                            
+                        </p:column>
+                        <p:column headerText="Genero" >
+                            <h:outputText value="#{item.usrGenero}" />
+                            
+                        </p:column>
+                        <p:column headerText="E mail" >
+                            <h:outputText value="#{item.usrEmail}" />
+                            
+                        </p:column>
+                        <p:column headerText="Usuario" >
+                            <h:outputText value="#{item.usrUsuario}" />                            
+                        </p:column>
+                        <p:column headerText="Privilegios" >
+                            <h:outputText value="#{item.usrPrivilegios}" />
+                            
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
             </ui:define>
             <ui:define name="bottom">
             </ui:define>

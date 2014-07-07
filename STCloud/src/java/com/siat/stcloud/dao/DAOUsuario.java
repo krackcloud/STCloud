@@ -6,7 +6,6 @@ package com.siat.stcloud.dao;
 
 import com.siat.stcloud.interfaces.InterfaceUsuario;
 import com.siat.stcloud.pojos.Usuario;
-import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;

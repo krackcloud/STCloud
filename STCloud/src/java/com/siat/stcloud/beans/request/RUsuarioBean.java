@@ -42,6 +42,29 @@ public class RUsuarioBean {
         fc.addMessage(null, mensaje);
     }
 
+    public List<Usuario> list() {
+        this.session=null;
+        this.transaccion=null;
+        try {
+            DAOUsuario dao = new DAOUsuario();
+            this.session=HibernateUtil.getSessionFactory().openSession();
+            this.transaccion=session.beginTransaction();
+            this.listaUsuarios = dao.list(session);
+            this.transaccion.commit();
+            
+        } catch (Exception err) {
+            if (this.transaccion != null) {
+                this.transaccion.rollback();
+            }
+            this.showMessage("Houston, tenemos un problema","Houston, tenemos un problema"+ err.getMessage(), FacesMessage.SEVERITY_FATAL);
+        } finally {
+            if (this.session != null) {
+                session.close();
+            }
+        }
+        return this.listaUsuarios;
+    }
+
     public void registrar() throws Exception {
         this.session = null;
         this.transaccion = null;
@@ -101,7 +124,7 @@ public class RUsuarioBean {
      * @return the listaUsuarios
      */
     public List<Usuario> getListaUsuarios() {
-        return listaUsuarios;
+        return list();
     }
 
     /**
