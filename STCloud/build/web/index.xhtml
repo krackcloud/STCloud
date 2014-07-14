@@ -18,7 +18,7 @@
                     <p:growl id="msg" showDetail="true" sticky="false" />
 
                     <!-- Muestra todas las carpetas del usuario -->
-                    <p:dataTable  id="tablaCarpeta" liveScroll="true"  var="item" value="#{usersession.carpetasUsuarios}" paginator="true" rows="5" selectionMode="single" selection="#{usersession.carpeta}" rowKey="#{item.idCarpeta}" filteredValue="#{usersession.carpetaSeleccion}">
+                    <p:dataTable  id="tablaCarpeta" var="item" value="#{usersession.carpetasUsuarios}" rows="5" selectionMode="single" selection="#{usersession.carpeta}" rowKey="#{item.idCarpeta}" filteredValue="#{usersession.carpetaSeleccion}">
                         <p:ajax event="rowSelect" update=":listContainer:tablaArchivo" /> 
                         <p:column headerText="Nombre"  filterBy="cptNombre">
                             <h:outputText value="#{item.cptNombre}" />
@@ -83,17 +83,17 @@
                         </h:form>
                     </h:panelGrid>
                 </p:dialog>
-                
-                 <!-- Muestra un dialogo para crear o modificar un archivo -->
+
+                <!-- Muestra un dialogo para crear o modificar un archivo -->
                 <p:dialog widgetVar="newFileDialog" resizable="false" position="center"  header="Subir un nuevo archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
                     <h:panelGrid id="newFile" columns="2">
                         <h:form id="frmAddAvo">
-                            <p:fileUpload mode="advanced" fileUploadListener="#{usersession.handleFileUpload}" dragDropSupport="true" update=":listContainer,:frmAddAvo" sizeLimit="25000000" fileLimit="1"  />
-                            
+                            <p:fileUpload mode="advanced" fileUploadListener="#{usersession.handleFileUpload}" dragDropSupport="true" update=":listContainer,:frmAddAvo" sizeLimit="25000000" fileLimit="1" oncomplete="newFileDialog.hide();"  />
+
                         </h:form>
                     </h:panelGrid>
                 </p:dialog>
-                 
+
             </ui:define>
             <ui:define name="bottom">
             </ui:define>

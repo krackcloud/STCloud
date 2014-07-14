@@ -27,10 +27,11 @@ public class DAOArchivo implements InterfaceArchivo {
     }
 
     @Override
-    public Archivo getFileByName(String nombreArchivo, Session session) throws Exception {
-        String hql = "from Archivo where nombre=:nombreArchivo";
+    public Archivo getFileByName(String nombreArchivo,Carpeta carpeta, Session session) throws Exception {
+        String hql = "from Archivo where nombre=:nombreArchivo and carpeta=:carpeta";
         Query query = session.createQuery(hql);
         query.setParameter("nombreArchivo", nombreArchivo);
+        query.setParameter("carpeta",carpeta);
         Archivo archivo = (Archivo) query.uniqueResult();
         return archivo;
     }

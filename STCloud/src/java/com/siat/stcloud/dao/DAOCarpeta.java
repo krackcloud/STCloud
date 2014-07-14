@@ -30,7 +30,7 @@ public class DAOCarpeta implements InterfaceCarpeta {
     }
 
     @Override
-    public Carpeta getCarpetaByNombre(String nombreCarpeta,Usuario usuario, Session session) throws Exception {
+    public Carpeta getCarpetaByNombre(String nombreCarpeta, Usuario usuario, Session session) throws Exception {
         String hql = "from Carpeta where cptNombre=:nombreCarpeta and usuario=:usuario";
         Query consulta = session.createQuery(hql);
         consulta.setParameter("nombreCarpeta", nombreCarpeta);

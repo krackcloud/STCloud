@@ -12,13 +12,13 @@
             <column name="idCarpeta" />
         </many-to-one>
         <property name="nombre" type="string">
-            <column name="nombre" length="30" />
+            <column name="nombre" length="100" />
         </property>
         <property name="fechaCreacion" type="timestamp">
             <column name="fechaCreacion" length="19" not-null="true" />
         </property>
         <property name="ruta" type="string">
-            <column name="ruta" length="100" />
+            <column name="ruta" length="500" />
         </property>
     </class>
 </hibernate-mapping>

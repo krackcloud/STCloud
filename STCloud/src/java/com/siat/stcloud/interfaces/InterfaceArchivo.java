@@ -17,7 +17,7 @@ import org.hibernate.Session;
 public interface InterfaceArchivo {
     
     public void createFile(Archivo archivo, Session session) throws Exception;
-    public Archivo getFileByName(String nombreArchivo, Session session)throws Exception;
+    public Archivo getFileByName(String nombreArchivo,Carpeta carpeta, Session session)throws Exception;
     public List<Archivo> list(Session session, Carpeta carpeta)throws Exception;
     public void deleteFile(Archivo archivo, Session session) throws Exception;
     public void updateFile(Archivo toReplace, Session session)throws Exception;

@@ -14,14 +14,11 @@ import com.siat.stcloud.pojos.Carpeta;
 import com.siat.stcloud.pojos.Usuario;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
@@ -51,11 +48,12 @@ public class SUsuarioBean implements Serializable {
     private Carpeta carpeta;
     private Carpeta addCarpeta;
     /*Manejo de los archivos del usuario*/
-    DAOArchivo daoArchivo;
+    private DAOArchivo daoArchivo;
     private List<Archivo> archivosUsuarios;
     private List<Archivo> archivoSeleccion;
     private Archivo archivo;
     private Archivo addArchivo;
+    
 
     public SUsuarioBean() {
         HttpSession miSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
@@ -64,6 +62,7 @@ public class SUsuarioBean implements Serializable {
         this.daoCarpeta = new DAOCarpeta();
         this.daoArchivo = new DAOArchivo();
         this.addCarpeta = new Carpeta();
+        this.addArchivo = new Archivo();
     }
 
     public void onReload() {
@@ -152,15 +151,15 @@ public class SUsuarioBean implements Serializable {
 
     public void handleFileUpload(FileUploadEvent event) {
         if (this.carpeta == null) {
-            this.showMessage("Selecciona una carpeta", "Clica sobre la carpeta en que deseas guardar", FacesMessage.SEVERITY_WARN);            
+            this.showMessage("Selecciona una carpeta", "Clica sobre la carpeta en que deseas guardar", FacesMessage.SEVERITY_WARN);
             return;
         }
-         if (uploadFile(event.getFile())) {
-         this.showMessage("Envio exitoso", "El archivo " + event.getFile().getFileName() + " se ha subido correctamente", FacesMessage.SEVERITY_INFO);
-         } else {
-         this.showMessage("El archivo no es compatible con este sistema", "Verifica que tu archivo no este dañado", FacesMessage.SEVERITY_WARN);
-         }
-         
+        if (uploadFile(event.getFile())) {
+            this.showMessage("Envio exitoso", "El archivo " + event.getFile().getFileName() + " se ha subido correctamente", FacesMessage.SEVERITY_INFO);
+        } else {
+            this.showMessage("El archivo no es compatible con este sistema", "Verifica que tu archivo no este dañado", FacesMessage.SEVERITY_WARN);
+        }
+
     }
 
     private boolean uploadFile(UploadedFile f) {
@@ -169,20 +168,43 @@ public class SUsuarioBean implements Serializable {
         String nombre;
         try {
             nombre = f.getFileName();
+            String path = this.carpeta.getCptRuta() + "\\" + nombre;
+            this.addArchivo.setIdArchivo(null);
+            this.addArchivo.setFechaCreacion(new Date());
+            this.addArchivo.setNombre(nombre);
+            this.addArchivo.setCarpeta(this.carpeta);
+            this.addArchivo.setRuta(path);
+            this.session = HibernateUtil.getSessionFactory().openSession();
+            this.transaccion = session.beginTransaction();
+            Archivo temp = daoArchivo.getFileByName(nombre, this.carpeta, this.session);
+            if (temp != null) {
+                this.showMessage("El archivo ya existe", "Este archivo ya existe. Si deseas modificarlo clica sobre el archivo existente", FacesMessage.SEVERITY_WARN);
+                this.transaccion.rollback();
+                return false;
+            }
+            this.daoArchivo.createFile(this.addArchivo, this.session);
             entrada = f.getInputstream();
-            salida = new FileOutputStream(new File(this.carpeta.getCptRuta()+"\\"+nombre));
+            salida = new FileOutputStream(new File(path));
             int read;
             byte[] bytes = new byte[1024];
-            while((read=entrada.read(bytes))!=-1){
-                salida.write(bytes,0,read);
+            while ((read = entrada.read(bytes)) != -1) {
+                salida.write(bytes, 0, read);
             }
             entrada.close();
-            salida.flush();
             salida.close();
+            this.transaccion.commit();
+            this.addArchivo = new Archivo();
             return true;
-        } catch (IOException err) {
+        } catch (Exception err) {
             this.showMessage("Ha ocurrido un problema. Contacta con tu administrador", "El error es: " + err.getMessage(), FacesMessage.SEVERITY_FATAL);
+            if (this.transaccion != null) {
+                this.transaccion.rollback();
+            }
             return false;
+        } finally {
+            if (this.session != null) {
+                this.session.close();
+            }
         }
     }
 
