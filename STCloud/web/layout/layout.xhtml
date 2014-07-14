@@ -15,12 +15,18 @@
         <div id="top" class="top">
             <h1>STCloud Storage In Cloud</h1>
             <h:form>
+                <div id="elementosSession">
+                    <span>
+                        <b>Bienvenido #{usersession.usuario}</b>
+                    </span>
+                    <p:commandButton value="Cerrar Sesion" icon="ui-icon-close" action="#{usersession.closeSession()}"/>
+                </div>
                 <p:megaMenu>
                     <p:submenu label="SIAT Cloud">
                         <p:column>
                             <p:submenu label="Ficheros">
-                                <p:menuitem value="Subir Archivo" url="#" icon="ui-icon-plus"/>
-                                <p:menuitem value="Crear Carpeta" url="#" icon="ui-icon-folder-open"/>                    
+                                <p:menuitem value="Subir Archivo" oncomplete="newFileDialog.show();" icon="ui-icon-plus"/>
+                                <p:menuitem value="Crear Carpeta" oncomplete="newFoldDialog.show();" icon="ui-icon-folder-open"/>                    
                             </p:submenu>
                         </p:column>
                     </p:submenu>

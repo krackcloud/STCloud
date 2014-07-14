@@ -17,8 +17,17 @@ function onlyText(event) {
 
 function onlyAlphaNumeric(event) {
     var charCode = (event.which) ? event.which : event.keyCode;
-    if ((charCode<48 || charCode>57) && (charCode < 64 || charCode > 92) && (charCode < 95 || charCode > 122)) {
+    if ((charCode < 48 || charCode > 57) && (charCode < 64 || charCode > 92) && (charCode < 95 || charCode > 122)) {
         return false;
     }
     return true;
+}
+
+function noEnie(event) {
+    var charCode = (event.which) ? event.which : event.keyCode;
+    var letra = String.fromCharCode(charCode)
+
+    var res = letra.match(/^[\w\.\-\_\,\+\ ]+$/i);
+    return (res !== null);
+
 }

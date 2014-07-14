@@ -9,6 +9,7 @@
     <h:head>
         <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/I.ico"/>
         <link rel="stylesheet" href="/STCloud/Resources/css/cssform.css" />
+        <script type="text/javascript" lang ="javascript" src="Resources/js/validate.js" />
         <f:facet name="first">
             <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
             <title>SIAT Filer</title>
@@ -20,21 +21,20 @@
         </h:form>
         <section class="contenedorLogin">
             <p:dialog  resizable="false" position="top"  header="Acceso de Usuarios" appendToBody="true" widgetVar="mensajeLogin" showEffect="explode" modal="true" closable="false" draggable="false">
-                <h:form class="formulario">
+                <h:form id="loginForm" class="formulario">
                     <p>Bienvenido a ST Cloud <br/> Almacenamiento online</p>
                     <p:growl id="growl" showDetail="true" sticky="false" />
                     <p:outputLabel for="txtusuario" value ="Usuario"/><br/>
-                    <p:inputText placeholder="Usuario"  maxlength="30" id="txtusuario"  title="Usuario"  value="#{user1.user}" required="true" requiredMessage="Campo de Usuario obligatorio" /><br/>
+                    <p:inputText placeholder="Usuario"  maxlength="30" id="txtusuario"  title="Usuario"  value="#{usersession.usuario}" required="true" requiredMessage="Campo de Usuario obligatorio" /><br/>
                     <p:outputLabel for="txtpass" value ="Contraseña"/><br/>
-                    <p:password placeholder="Contraseña" maxlength="15" id="txtpass"  value="#{user1.password}" required="true" requiredMessage="Campo de Contraseña obligatorio"/><br/>
-                    <h:messages infoStyle="color:green;" errorStyle="color:red;" /><br/>                    
+                    <p:password onkeypress='return noEnie(event);' placeholder="Contraseña" maxlength="15" id="txtpass"  value="#{usersession.contrasenia}" required="true" requiredMessage="Campo de Contraseña obligatorio"/><br/>                    
                     <p:lightBox onHide="mensajeLogin.show()" onShow="mensajeLogin.hide()" iframe="true" widgetVar="lightWindow" id="lighbox3" >
-                        <h:outputLink value="http://localhost:8083/STCloud/faces/Registro.xhtml" title="Registrar">
+                        <h:outputLink value="http://localhost:8083/STCloud/Registro.xhtml" title="Registrar">
                             <h:outputText value="Registrar" />
                         </h:outputLink>
                     </p:lightBox>
                     <p:commandButton value="Acceder"
-                                     action="#{user1.login}" />
+                                     action="#{usersession.login}" update="loginForm" />
                 </h:form>
             </p:dialog>
         </section>

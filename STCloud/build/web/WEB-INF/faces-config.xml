@@ -8,4 +8,14 @@
         <managed-bean-class>com.siat.stcloud.beans.request.RUsuarioBean</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>usersession</managed-bean-name>
+        <managed-bean-class>com.siat.stcloud.beans.session.SUsuarioBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>file</managed-bean-name>
+        <managed-bean-class>com.siat.stcloud.beans.request.RFileBean</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
 </faces-config>

@@ -8,7 +8,8 @@ import com.siat.stcloud.dao.DAOUsuario;
 import com.siat.stcloud.hibernate.HibernateUtil;
 import com.siat.stcloud.net.Encrypt;
 import com.siat.stcloud.pojos.Usuario;
-import java.util.List;
+import java.io.File;
+import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
@@ -19,13 +20,12 @@ import org.hibernate.Transaction;
  *
  * @author KRACK
  */
-public class RUsuarioBean {
+public class RUsuarioBean implements Serializable {
 
     /**
      * Creates a new instance of RUsuarioBean
      */
     private Usuario usuario;
-    private List<Usuario> listaUsuarios;
     private String password2;
     private Session session;
     private Transaction transaccion;
@@ -40,29 +40,6 @@ public class RUsuarioBean {
         FacesContext fc = FacesContext.getCurrentInstance();
         FacesMessage mensaje = new FacesMessage(severidad, titulo, detalle);
         fc.addMessage(null, mensaje);
-    }
-
-    public List<Usuario> list() {
-        this.session=null;
-        this.transaccion=null;
-        try {
-            DAOUsuario dao = new DAOUsuario();
-            this.session=HibernateUtil.getSessionFactory().openSession();
-            this.transaccion=session.beginTransaction();
-            this.listaUsuarios = dao.list(session);
-            this.transaccion.commit();
-            
-        } catch (Exception err) {
-            if (this.transaccion != null) {
-                this.transaccion.rollback();
-            }
-            this.showMessage("Houston, tenemos un problema","Houston, tenemos un problema"+ err.getMessage(), FacesMessage.SEVERITY_FATAL);
-        } finally {
-            if (this.session != null) {
-                session.close();
-            }
-        }
-        return this.listaUsuarios;
     }
 
     public void registrar() throws Exception {
@@ -83,13 +60,14 @@ public class RUsuarioBean {
                 this.usuario.setUsrUsuario(null);
                 return;
             }
-
             String tempName = this.getUsuario().getUsrNombre().trim().replace("Ã±", "Ñ").toUpperCase();
 
             this.getUsuario().setUsrNombre(tempName);
             this.getUsuario().setUsrContrasenia(Encrypt.sha512(this.getUsuario().getUsrContrasenia()));
             user.register(this.session, this.usuario);
             this.transaccion.commit();
+            File f = new File("C:\\Servers\\FileZillaClients\\DIR_KRACKINATOR\\DIR_" + this.getUsuario().getUsrUsuario());
+            f.mkdir();
             this.usuario = new Usuario();
             System.gc();
             this.showMessage("El usuario ha sido registrado exitosamente", "El usuario ha sido registrado exitosamente", FacesMessage.SEVERITY_INFO);
@@ -118,20 +96,6 @@ public class RUsuarioBean {
      */
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
-    }
-
-    /**
-     * @return the listaUsuarios
-     */
-    public List<Usuario> getListaUsuarios() {
-        return list();
-    }
-
-    /**
-     * @param listaUsuarios the listaUsuarios to set
-     */
-    public void setListaUsuarios(List<Usuario> listaUsuarios) {
-        this.listaUsuarios = listaUsuarios;
     }
 
     /**

@@ -13,47 +13,90 @@
             <ui:define name="top">
             </ui:define>
             <ui:define name="content">
-                Bienvenido #{user1.user}<hr/>
-                <h1>Mis usuarios</h1>
-                <h:form>
+                <h:form id="listContainer">
+                    <p:remoteCommand actionListener="#{usersession.onReload()}" autoRun="true"/>
                     <p:growl id="msg" showDetail="true" sticky="false" />
-                    <p:dataTable id="tablaLista" var="item" value="#{user.listaUsuarios}" paginator="true" rows="5" >
-                        <f:facet name="header">
-                            Lista                            
-                        </f:facet>
-                        
-                        <p:column headerText="ID" >
-                            <h:outputText value="#{item.idUsuario}" />
+
+                    <!-- Muestra todas las carpetas del usuario -->
+                    <p:dataTable  id="tablaCarpeta" liveScroll="true"  var="item" value="#{usersession.carpetasUsuarios}" paginator="true" rows="5" selectionMode="single" selection="#{usersession.carpeta}" rowKey="#{item.idCarpeta}" filteredValue="#{usersession.carpetaSeleccion}">
+                        <p:ajax event="rowSelect" update=":listContainer:tablaArchivo" /> 
+                        <p:column headerText="Nombre"  filterBy="cptNombre">
+                            <h:outputText value="#{item.cptNombre}" />
                         </p:column>
-                        <p:column headerText="Nombre" >
-                            <h:outputText value="#{item.usrNombre}" />
-                            
+                        <p:column headerText="Fecha de creación" filterBy="cptFechaCreacion" >
+                            <h:outputText value="#{item.cptFechaCreacion}" />
                         </p:column>
-                        <p:column headerText="Fecha de Nacimiento" >
-                            <h:outputText value="#{item.usrFechaNacimiento}" />
-                            
+                        <p:column>
+                            <p:commandButton icon="ui-icon-close" />
+                            <p:commandButton icon="ui-icon-pencil" />
                         </p:column>
-                        <p:column headerText="Genero" >
-                            <h:outputText value="#{item.usrGenero}" />
-                            
+                    </p:dataTable>
+
+                    <!-- Muestra todos los archivos correspondientes a la carpeta -->
+                    <p:dataTable id="tablaArchivo" var="archivo" value="#{usersession.archivosUsuarios}" paginator="true" rows="5" selectionMode="single" selection="#{usersession.archivo}" rowKey="#{archivo.idArchivo}" filteredValue="#{usersession.archivoSeleccion}">
+                        <p:ajax event="rowSelect" update=":displayFile" oncomplete="fileDialog.show()"/> 
+                        <p:column headerText="Nombre" filterBy="nombre">
+                            <h:outputText value="#{archivo.nombre}" />
                         </p:column>
-                        <p:column headerText="E mail" >
-                            <h:outputText value="#{item.usrEmail}" />
-                            
-                        </p:column>
-                        <p:column headerText="Usuario" >
-                            <h:outputText value="#{item.usrUsuario}" />                            
-                        </p:column>
-                        <p:column headerText="Privilegios" >
-                            <h:outputText value="#{item.usrPrivilegios}" />
-                            
+                        <p:column headerText="Fecha de creación" filterBy="fechaCreacion" >
+                            <h:outputText value="#{archivo.fechaCreacion}" />
                         </p:column>
                     </p:dataTable>
                 </h:form>
+                <!-- Muestra un dialogo con los detalles de la carpeta -->
+                <p:dialog widgetVar="userDialog" resizable="false" position="top"  header="Detalles de la carpeta" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
+                    <h:panelGrid id="display" columns="2">
+                        <p:outputLabel value="ID"/>
+                        <p:outputLabel value="#{usersession.carpeta.idCarpeta}"/>
+                        <p:outputLabel value="Nombre"/>
+                        <p:outputLabel value="#{usersession.carpeta.cptNombre}"/>
+                        <p:outputLabel value="Fecha de Creacion"/>
+                        <p:outputLabel value="#{usersession.carpeta.cptFechaCreacion}"/>
+                        <p:outputLabel value="Ruta"/>             
+                        <p:outputLabel value="#{usersession.carpeta.cptRuta}"/>                                           
+                    </h:panelGrid> 
+                </p:dialog>
+
+                <!-- Muestra un dialogo con los detalles del archivo -->
+                <p:dialog widgetVar="fileDialog" resizable="false" position="top"  header="Detalles del archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
+                    <h:panelGrid id="displayFile" columns="2">
+                        <p:outputLabel value="ID"/>
+                        <p:outputLabel value="#{usersession.archivo.idArchivo}"/>
+                        <p:outputLabel value="Nombre"/>
+                        <p:outputLabel value="#{usersession.archivo.nombre}"/>
+                        <p:outputLabel value="Fecha de Creacion"/>
+                        <p:outputLabel value="#{usersession.archivo.fechaCreacion}"/>
+                        <p:outputLabel value="Ruta"/>             
+                        <p:outputLabel value="#{usersession.archivo.ruta}"/>                                           
+                    </h:panelGrid>
+                </p:dialog>
+
+                <!-- Muestra un dialogo para crear o modificar una carpeta -->
+                <p:dialog widgetVar="newFoldDialog" resizable="false" position="center"  header="Creacion de una nueva carpeta" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
+                    <h:panelGrid id="newFolder" columns="2">
+                        <h:form id="frmAddCpt">
+                            <p:outputLabel value="Nombre de la carpeta"/>                        
+                            <p:inputText validatorMessage="Solo admite caracteres a-z A-Z 0-9 _ - sin espacios y el nombre debe comenzar con letras y/o numeros" value="#{usersession.addCarpeta.cptNombre}" required="true" requiredMessage="Este campo es obligatorio" maxlength="20">
+                                <f:validateRegex pattern="^[A-Za-z0-9\+]([_A-Za-z0-9-]+)*"/>
+                            </p:inputText>
+                            <p:commandButton actionListener="#{usersession.createNewFolder()}" value="Crear" update=":listContainer,:frmAddCpt" oncomplete="newFoldDialog.hide();" icon="ui-icon-plus" />
+                        </h:form>
+                    </h:panelGrid>
+                </p:dialog>
+                
+                 <!-- Muestra un dialogo para crear o modificar un archivo -->
+                <p:dialog widgetVar="newFileDialog" resizable="false" position="center"  header="Subir un nuevo archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
+                    <h:panelGrid id="newFile" columns="2">
+                        <h:form id="frmAddAvo">
+                            <p:fileUpload mode="advanced" fileUploadListener="#{usersession.handleFileUpload}" dragDropSupport="true" update=":listContainer,:frmAddAvo" sizeLimit="25000000" fileLimit="1"  />
+                            
+                        </h:form>
+                    </h:panelGrid>
+                </p:dialog>
+                 
             </ui:define>
             <ui:define name="bottom">
             </ui:define>
         </ui:composition>
-
     </body>
 </html>

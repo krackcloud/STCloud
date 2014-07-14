@@ -52,8 +52,8 @@
                             <p:message for="txtUsuario" />
                             <p:tooltip for="txtUsuario" hideEvent="blur" showEvent="focus" />
                         </h:panelGroup>
-                        <p:outputLabel value="Contraseña" for="txtPass1" />                    
-                        <p:password   title="Minimo 8 caracteres" placeholder="Contraseña" label="pass" id="txtPass1" value="#{user.getUsuario().usrContrasenia}" maxlength="20">
+                        <p:outputLabel value="Contraseña*" for="txtPass1" />                    
+                        <p:password   title="Minimo 8 caracteres" onkeypress='return noEnie(event);' placeholder="Contraseña" label="pass" id="txtPass1" value="#{user.getUsuario().usrContrasenia}" maxlength="20">
                             <f:validator validatorId="empty"/>
                         </p:password>
                         <h:panelGroup>
@@ -61,7 +61,7 @@
                             <p:tooltip for="txtPass1" hideEvent="blur" showEvent="focus" />                            
                         </h:panelGroup>
                         <p:outputLabel  for="txtPass2" value="Repita Contraseña" />                    
-                        <p:password placeholder="Repita Contraseña" label="Repita Contraseña" value="#{user.password2}" id="txtPass2" maxlength="20"/>
+                        <p:password onkeypress='return noEnie(event);' placeholder="Repita Contraseña" label="Repita Contraseña" value="#{user.password2}" id="txtPass2" maxlength="20"/>
                         <h:panelGroup>
                             <p:message for="txtPass2" />
                         </h:panelGroup>
