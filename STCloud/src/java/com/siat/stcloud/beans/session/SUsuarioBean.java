@@ -53,16 +53,15 @@ public class SUsuarioBean implements Serializable {
     private List<Archivo> archivoSeleccion;
     private Archivo archivo;
     private Archivo addArchivo;
-    
 
     public SUsuarioBean() {
         HttpSession miSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
         miSession.setMaxInactiveInterval(600);
         this.daoArchivo = new DAOArchivo();
         this.daoCarpeta = new DAOCarpeta();
-        this.daoArchivo = new DAOArchivo();
         this.addCarpeta = new Carpeta();
         this.addArchivo = new Archivo();
+        this.archivo = new Archivo();
     }
 
     public void onReload() {
@@ -112,16 +111,22 @@ public class SUsuarioBean implements Serializable {
 
     public void createNewFolder() {
         DAOCarpeta folderDAO;
+        String folderName = this.addCarpeta.getCptNombre().trim();
+        if (folderName.length() <= 0) {
+            this.showMessage("Carpeta sin nombre", "Asignale por favor un nombre a tu carpeta", FacesMessage.SEVERITY_ERROR);
+            return;
+        }
         try {
             folderDAO = new DAOCarpeta();
             this.session = HibernateUtil.getSessionFactory().openSession();
             this.transaccion = session.beginTransaction();
-            Carpeta folder = folderDAO.getCarpetaByNombre(this.addCarpeta.getCptNombre(), this.user, this.session);
+            Carpeta folder = folderDAO.getCarpetaByNombre(folderName, this.user, this.session);
             if (folder != null) {
                 this.showMessage("La carpeta ya existe", "Puedes modificar desde las opciones de la derecha", FacesMessage.SEVERITY_WARN);
                 this.transaccion.rollback();
                 return;
             }
+            this.addCarpeta.setCptNombre(folderName);
             this.addCarpeta.setArchivos(null);
             this.addCarpeta.setCptFechaCreacion(new Date());
             this.addCarpeta.setArchivos(null);
@@ -147,6 +152,90 @@ public class SUsuarioBean implements Serializable {
             }
         }
 
+    }
+
+    public void deleteFolder() {
+        String folderName = this.carpeta.getCptNombre();
+        try {
+            this.session = HibernateUtil.getSessionFactory().openSession();
+            this.transaccion = this.session.beginTransaction();
+            this.daoCarpeta.deleteCarpeta(this.carpeta, this.session);
+            this.transaccion.commit();
+            File folderPath = new File(this.carpeta.getCptRuta());
+            this.deletePhysicalFolder(folderPath);
+            folderPath.delete();
+            this.showMessage("Carpeta Eliminada", "Se ha eliminado satisfactoriamente la carpeta " + folderName, FacesMessage.SEVERITY_INFO);
+
+        } catch (Exception err) {
+            System.out.println(err.getMessage());
+            if (this.transaccion != null) {
+                this.transaccion.rollback();
+            }
+            this.showMessage("Problemas al eliminar", "Consulte con su administrador. Error tipo: " + err.getMessage(), FacesMessage.SEVERITY_ERROR);
+        } finally {
+            if (this.session != null) {
+                this.session.close();
+            }
+        }
+    }
+
+    public void updateFolder() {
+        String folderName = this.addCarpeta.getCptNombre().trim();
+        if (folderName.length() <= 0) {
+            this.showMessage("Carpeta sin nombre", "Asignale por favor un nuevo nombre a esta carpeta", FacesMessage.SEVERITY_ERROR);
+            return;
+        }
+        try {
+            this.session = HibernateUtil.getSessionFactory().openSession();
+            this.transaccion = session.beginTransaction();
+            Carpeta folder = this.daoCarpeta.getCarpetaByNombre(folderName, this.user, this.session);
+            if (folder != null) {
+                this.showMessage("La carpeta ya existe", "Puedes modificar desde las opciones de la derecha", FacesMessage.SEVERITY_WARN);
+                this.transaccion.rollback();
+                return;
+            }
+            this.carpeta.setCptNombre(folderName);
+            /*Actualización de la carpeta*/
+            String actualPath = carpeta.getCptRuta();
+            String folderPath = actualPath.substring(0, carpeta.getCptRuta().lastIndexOf("\\"));
+            String newNamePath = folderPath + "\\" + folderName;
+            carpeta.setCptRuta(newNamePath);
+            this.daoCarpeta.updateCarpeta(this.carpeta, this.session);
+            /*Renombrando archivos de la carpeta*/
+            List<Archivo> archivos = this.daoArchivo.list(this.session, this.carpeta);
+            for (int i = 0; i < archivos.size(); i++) {
+                Archivo temp = archivos.get(i);
+                temp.setRuta(newNamePath + "\\" + temp.getNombre());
+                daoArchivo.updateFile(temp, this.session);
+            }
+            /*Renombramos la carpeta dentro del servidor*/
+            File f = new File(actualPath);
+            f.renameTo(new File(newNamePath));
+            this.showMessage("Carpeta renombrada", "El nuevo nombre será " + folderName, FacesMessage.SEVERITY_INFO);
+            this.transaccion.commit();
+            this.addCarpeta = new Carpeta();
+        } catch (Exception err) {
+            if (this.transaccion != null) {
+                this.transaccion.rollback();
+            }
+            this.showMessage("Operacion no realizada", "Consulte con el administrador. Error tipo: " + err.getMessage(), FacesMessage.SEVERITY_WARN);
+
+        } finally {
+            if (this.session != null) {
+                session.close();
+            }
+        }
+    }
+
+    private void deletePhysicalFolder(File folder) {
+        File[] temps = folder.listFiles();
+        for (int i = 0; i < temps.length; i++) {
+            File temp = temps[i];
+            if (temp.isDirectory()) {
+                deletePhysicalFolder(temp);
+            }
+            temp.delete();
+        }
     }
 
     public void handleFileUpload(FileUploadEvent event) {
