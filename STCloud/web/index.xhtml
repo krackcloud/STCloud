@@ -7,7 +7,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 
     <body>
-
+        <script type="text/javascript" lang ="javascript" src="Resources/js/validate.js" />
         <ui:composition template="./layout/layout.xhtml">
 
             <ui:define name="top">
@@ -24,7 +24,7 @@
                         <p:menuitem value="Subir Archivo" oncomplete="newFileDialog.show();" icon="ui-icon-plus" />
                         <p:menuitem icon="ui-icon-trash" >
                             <p:commandLink  update="tablaCarpeta" actionListener="#{usersession.deleteFolder()}" styleClass="ui-menuitem-link" ajax="false">
-                                <h:outputText styleClass="ui-menuitem-icon ui-icon ui-icon-close" />
+                                <h:outputText styleClass="ui-menuitem-icon ui-icon ui-icon-trash" />
                                 <h:outputText styleClass="ui-menuitem-text" value="Eliminar" />
                                 <p:confirm header="Aviso" message="Al eliminar esta carpeta se borraran todos los archivos. ¿Seguro que desea continuar?" icon="ui-icon-alert" />
                             </p:commandLink>
@@ -48,6 +48,30 @@
                 <!-- Muestra un dialogo con los detalles de la carpeta -->
                 <p:dialog widgetVar="userDialog" resizable="false" position="top"  header="Detalles de la carpeta" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
                     <h:form id="file">
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                        </p:confirmDialog>
+                        <!-- Menu contextual con las opciones para cada archivo -->
+                        <p:contextMenu for="tablaArchivo" event="mouseover">
+                            <p:menuitem icon="ui-icon-arrowthickstop-1-s">
+                                <p:commandLink styleClass="ui-menuitem-link" actionListener="#{usersession.downloadFile()}" ajax="false">
+                                    <h:outputText styleClass="ui-menuitem-icon ui-icon ui-icon-arrowthickstop-1-s" />
+                                    <h:outputText styleClass="ui-menuitem-text" value="Descargar" />
+                                    <p:fileDownload value="#{usersession.file}"/>
+                                </p:commandLink>
+                            </p:menuitem>
+                            <p:menuitem icon="ui-icon-trash" >
+                                <p:commandLink  update="tablaArchivo" actionListener="#{usersession.deleteFile()}" styleClass="ui-menuitem-link" ajax="false">
+                                    <h:outputText styleClass="ui-menuitem-icon ui-icon ui-icon-trash" />
+                                    <h:outputText styleClass="ui-menuitem-text" value="Eliminar" />
+                                    <p:confirm header="Aviso" message="¿Seguro que desea eliminar este archivo?" icon="ui-icon-alert" />
+                                </p:commandLink>
+                            </p:menuitem>
+                            <p:menuitem oncomplete="updFileDialog.show();" value="Renombrar" icon="ui-icon-pencil" />
+
+                        </p:contextMenu>
                         <!-- Muestra todos los archivos correspondientes a la carpeta -->
                         <p:dataTable id="tablaArchivo" var="archivo" value="#{usersession.archivosUsuarios}" paginator="true" rows="5" selectionMode="single" selection="#{usersession.archivo}" rowKey="#{archivo.idArchivo}" filteredValue="#{usersession.archivoSeleccion}">
                             <p:ajax event="rowSelect" update=":displayFile" onsuccess="fileDialog.show()"/> 
@@ -65,7 +89,6 @@
                 </p:dialog>
 
                 <!-- Muestra un dialogo con los detalles del archivo -->
-
                 <p:dialog widgetVar="fileDialog" resizable="false" position="top"  header="Detalles del archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
                     <h:panelGrid id="displayFile" columns="2">
                         <p:outputLabel value="ID"/>
@@ -83,22 +106,29 @@
                     <h:panelGrid id="newFolder" columns="2">
                         <h:form id="frmAddCpt">
                             <p:outputLabel value="Nombre de la carpeta"/>                        
-                            <p:inputText validatorMessage="Solo admite caracteres a-z A-Z 0-9" value="#{usersession.addCarpeta.cptNombre}" required="true" requiredMessage="Este campo es obligatorio" maxlength="20">
-                                <f:validateRegex pattern="[A-Z a-z0-9]*"/>
-                            </p:inputText>
+                            <p:inputText onkeypress="return rename(event);" value="#{usersession.addCarpeta.cptNombre}" required="true" requiredMessage="Este campo es obligatorio" maxlength="20"/>
                             <p:commandButton actionListener="#{usersession.createNewFolder()}" value="Crear" update=":listContainer,:frmAddCpt" oncomplete="newFoldDialog.hide();" icon="ui-icon-plus" />
                         </h:form>
                     </h:panelGrid>
                 </p:dialog>
-                 <!-- Muestra un dialogo para renombrar una carpeta -->
+                <!-- Muestra un dialogo para renombrar una carpeta -->
                 <p:dialog widgetVar="updFoldDialog" resizable="false" position="center"  header="Modificacion de una nueva carpeta" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
                     <h:panelGrid id="updFolder" columns="2">
                         <h:form id="frmupdCpt">
                             <p:outputLabel value="Nombre de la carpeta"/>                        
-                            <p:inputText validatorMessage="Solo admite caracteres a-z A-Z 0-9" value="#{usersession.addCarpeta.cptNombre}" required="true" requiredMessage="Este campo es obligatorio" maxlength="20">
-                                <f:validateRegex pattern="[A-Z a-z0-9]*"/>
-                            </p:inputText>
+                            <p:inputText onkeypress="return rename(event);" value="#{usersession.addCarpeta.cptNombre}" required="true" requiredMessage="Este campo es obligatorio" maxlength="20"/>
+                               
                             <p:commandButton actionListener="#{usersession.updateFolder()}" value="Crear" update=":listContainer,:frmupdCpt,:file:tablaArchivo" oncomplete="updFoldDialog.hide();" icon="ui-icon-plus" />
+                        </h:form>
+                    </h:panelGrid>
+                </p:dialog>
+                <!-- Muestra un dialogo para renombrar una carpeta -->
+                <p:dialog widgetVar="updFileDialog" resizable="false" position="center"  header="Modificacion de un archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
+                    <h:panelGrid id="updFile" columns="2">
+                        <h:form id="frmupdFle">
+                            <p:outputLabel value="Nuevo nombre del archivo"/>                        
+                            <p:inputText onkeypress="return rename(event);" value="#{usersession.addArchivo.nombre}" required="true" requiredMessage="Este campo es obligatorio" maxlength="20"/>
+                            <p:commandButton actionListener="#{usersession.updateFile()}" value="Crear" update=":listContainer,:frmupdFle,:file:tablaArchivo" oncomplete="updFileDialog.hide();" icon="ui-icon-plus" />
                         </h:form>
                     </h:panelGrid>
                 </p:dialog>

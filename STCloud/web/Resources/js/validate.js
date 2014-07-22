@@ -29,5 +29,12 @@ function noEnie(event) {
 
     var res = letra.match(/^[\w\.\-\_\,\+\ ]+$/i);
     return (res !== null);
+}
 
+function rename(event) {
+    var charCode = (event.which) ? event.which : event.keyCode;
+    var letra = String.fromCharCode(charCode)
+
+    var res = letra.match(/^[\w\-\_\ ]+$/i);
+    return (res !== null);
 }
