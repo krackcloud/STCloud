@@ -12,6 +12,7 @@ import com.siat.stcloud.net.Encrypt;
 import com.siat.stcloud.pojos.Archivo;
 import com.siat.stcloud.pojos.Carpeta;
 import com.siat.stcloud.pojos.Usuario;
+import com.siat.stcloud.utils.Zip;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -123,10 +124,10 @@ public class SUsuarioBean implements Serializable {
             this.showMessage("Carpeta sin nombre", "Asignale por favor un nombre a tu carpeta", FacesMessage.SEVERITY_ERROR);
             return;
         }
-        
-        if (folderName.startsWith("-")||folderName.startsWith("_")||Pattern.matches("[0-9]*", folderName.substring(0,1))){
+
+        if (folderName.startsWith("-") || folderName.startsWith("_") || Pattern.matches("[0-9]*", folderName.substring(0, 1))) {
             this.showMessage("Nombre innválido", "El nombre debe comenzar con letra", FacesMessage.SEVERITY_WARN);
-            return;            
+            return;
         }
         try {
             folderDAO = new DAOCarpeta();
@@ -197,10 +198,10 @@ public class SUsuarioBean implements Serializable {
             this.showMessage("Carpeta sin nombre", "Asignale por favor un nuevo nombre a esta carpeta", FacesMessage.SEVERITY_ERROR);
             return;
         }
-        
-        if (folderName.startsWith("-")||folderName.startsWith("_")||Pattern.matches("[0-9]*", folderName.substring(0,1))){
+
+        if (folderName.startsWith("-") || folderName.startsWith("_") || Pattern.matches("[0-9]*", folderName.substring(0, 1))) {
             this.showMessage("Nombre innválido", "El nombre debe comenzar con letra", FacesMessage.SEVERITY_WARN);
-            return;            
+            return;
         }
         try {
             this.session = HibernateUtil.getSessionFactory().openSession();
@@ -260,68 +261,82 @@ public class SUsuarioBean implements Serializable {
         try {
             InputStream input = new FileInputStream(f);
             ExternalContext container = FacesContext.getCurrentInstance().getExternalContext();
-            this.file = new DefaultStreamedContent(input,container.getMimeType(f.getName()),f.getName());
+            this.file = new DefaultStreamedContent(input, container.getMimeType(f.getName()), f.getName());
         } catch (Exception err) {
-            this.showMessage("Problemas al descargar", "Consulta con tu administrador. Error tipo: "+err.getMessage(), FacesMessage.SEVERITY_WARN);
+            this.showMessage("Problemas al descargar", "Consulta con tu administrador. Error tipo: " + err.getMessage(), FacesMessage.SEVERITY_WARN);
         }
-    }   
-    
-    public void deleteFile(){
-       try{
-           this.session = HibernateUtil.getSessionFactory().openSession();
-           this.transaccion = session.beginTransaction();           
-           File f = new File(this.archivo.getRuta());
-           f.delete();
-           this.daoArchivo.deleteFile(this.archivo, this.session);
-           this.transaccion.commit();
-           this.showMessage("Eliminado", "El archivo se ha eliminado correctamente", FacesMessage.SEVERITY_INFO);
-           this.archivo=new Archivo();
-       }catch(Exception err){
-           if (this.transaccion!=null){
-               this.transaccion.rollback();
-           }
-           this.showMessage("Ha ocurrido un problema","Consulte con su administrador. Error: "+err.getMessage(),FacesMessage.SEVERITY_WARN);
-       }
-       finally{
-           if (this.session!=null){
-               this.session.close();
-           }
-       }
     }
-    
-    
-    public void updateFile(){
+
+    public void downloadZIPFolder() {
+        String origen = this.carpeta.getCptRuta();
+        String destino = origen.substring(0,origen.lastIndexOf("\\"))+"\\"+this.carpeta.getCptNombre()+".zip";
+        Zip z = new Zip(origen,destino);
+        z.create();
+        File f = new File(destino);
+        try{
+            InputStream input = new FileInputStream(f);
+            ExternalContext container = FacesContext.getCurrentInstance().getExternalContext();
+            this.file = new DefaultStreamedContent(input, container.getMimeType(f.getName()), f.getName());
+            f.delete();
+        }catch(Exception err){
+            this.showMessage("Problemas al descargar", "Consulta con tu administrador. Error tipo: " + err.getMessage(), FacesMessage.SEVERITY_WARN);
+        }
+    }
+
+    public void deleteFile() {
+        try {
+            this.session = HibernateUtil.getSessionFactory().openSession();
+            this.transaccion = session.beginTransaction();
+            File f = new File(this.archivo.getRuta());
+            f.delete();
+            this.daoArchivo.deleteFile(this.archivo, this.session);
+            this.transaccion.commit();
+            this.showMessage("Eliminado", "El archivo se ha eliminado correctamente", FacesMessage.SEVERITY_INFO);
+            this.archivo = new Archivo();
+        } catch (Exception err) {
+            if (this.transaccion != null) {
+                this.transaccion.rollback();
+            }
+            this.showMessage("Ha ocurrido un problema", "Consulte con su administrador. Error: " + err.getMessage(), FacesMessage.SEVERITY_WARN);
+        } finally {
+            if (this.session != null) {
+                this.session.close();
+            }
+        }
+    }
+
+    public void updateFile() {
         String nombreArchivo = this.addArchivo.getNombre();
-        
-        if (nombreArchivo.trim().length()<=0){
+
+        if (nombreArchivo.trim().length() <= 0) {
             this.showMessage("Archivo sin nombre", "Asignale un nombre a este archivo por favor", FacesMessage.SEVERITY_WARN);
             return;
         }
-        if (nombreArchivo.startsWith("-")||nombreArchivo.startsWith("_")||Pattern.matches("[0-9]*", nombreArchivo.substring(0,1))){
+        if (nombreArchivo.startsWith("-") || nombreArchivo.startsWith("_") || Pattern.matches("[0-9]*", nombreArchivo.substring(0, 1))) {
             this.showMessage("Nombre innválido", "El nombre debe comenzar con letra", FacesMessage.SEVERITY_WARN);
-            return;            
+            return;
         }
-        try{
+        try {
             this.session = HibernateUtil.getSessionFactory().openSession();
             this.transaccion = this.session.beginTransaction();
-            String ext = this.archivo.getNombre().substring(this.archivo.getNombre().lastIndexOf(".")+1);
+            String ext = this.archivo.getNombre().substring(this.archivo.getNombre().lastIndexOf(".") + 1);
             String path = this.archivo.getRuta();
-            String newPath = path.substring(0,path.lastIndexOf("\\"))+"\\"+nombreArchivo+"."+ext;
+            String newPath = path.substring(0, path.lastIndexOf("\\")) + "\\" + nombreArchivo + "." + ext;
             File f = new File(path);
-            this.archivo.setNombre(nombreArchivo+"."+ext);
+            this.archivo.setNombre(nombreArchivo + "." + ext);
             this.archivo.setRuta(newPath);
             daoArchivo.updateFile(this.archivo, this.session);
             f.renameTo(new File(newPath));
             this.transaccion.commit();
             this.showMessage("Cambio realizado", "El archivo ha sido renombrado", FacesMessage.SEVERITY_INFO);
             this.addArchivo = new Archivo();
-        }catch(Exception err){
-            if (this.transaccion!=null){
+        } catch (Exception err) {
+            if (this.transaccion != null) {
                 this.transaccion.rollback();
             }
-            this.showMessage("Ha ocurrido un problema","Consulte con su administrador. Error "+err.getMessage(), FacesMessage.SEVERITY_ERROR);
-        }finally{
-            if (this.session!=null){
+            this.showMessage("Ha ocurrido un problema", "Consulte con su administrador. Error " + err.getMessage(), FacesMessage.SEVERITY_ERROR);
+        } finally {
+            if (this.session != null) {
                 this.session.close();
             }
         }
