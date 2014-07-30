@@ -61,6 +61,7 @@ public class SUsuarioBean implements Serializable {
     private Archivo addArchivo;
     /*Objeto de descarga*/
     private StreamedContent file;
+    private String editor;
 
     public SUsuarioBean() {
         HttpSession miSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
@@ -406,6 +407,11 @@ public class SUsuarioBean implements Serializable {
         FacesMessage mensaje = new FacesMessage(severidad, titulo, detalle);
         fc.addMessage(null, mensaje);
     }
+    
+    public void createDocument(){
+        System.out.println(this.editor);
+        this.editor=null;
+    }
 
     /**
      * @return the usuario
@@ -582,5 +588,19 @@ public class SUsuarioBean implements Serializable {
      */
     public StreamedContent getFile() {
         return file;
+    }
+
+    /**
+     * @return the editor
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * @param editor the editor to set
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
     }
 }

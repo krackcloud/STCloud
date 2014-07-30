@@ -21,6 +21,7 @@
                     <p:remoteCommand actionListener="#{usersession.onReload()}" autoRun="true"/>
                     <p:growl id="msg" showDetail="true" sticky="false" />
                     <p:contextMenu for="tablaCarpeta" event="mouseover">
+                        <p:menuitem value ='Crear Documento' update=":frmeditor" oncomplete="editorDialog.show();" icon="ui-icon-document" />
                         <p:menuitem value="Subir Archivo" oncomplete="newFileDialog.show();" icon="ui-icon-plus" />
                         <p:menuitem icon="ui-icon ui-icon-disk">
                             <p:commandLink styleClass="ui-menuitem-link"  actionListener="#{usersession.downloadZIPFolder()}" ajax="false">
@@ -147,6 +148,16 @@
                             <p:fileUpload mode="advanced" fileUploadListener="#{usersession.handleFileUpload}" dragDropSupport="true" update=":listContainer,:frmAddAvo" sizeLimit="25000000" fileLimit="1" oncomplete="newFileDialog.hide();"  />
                         </h:form>
                     </h:panelGrid>
+                </p:dialog>
+                <!-- Muestra un dialogo para escribir texto con formato -->
+                <p:dialog widgetVar="editorDialog" resizable="false" position="center"  header="Subir un nuevo archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
+                    <h:form id="frmeditor">
+                        <p:editor id="editor" widgetVar="miEditor" value="#{usersession.editor}" width="600" />
+                        <h:panelGrid id="editorText" columns="2">
+                            <p:commandButton actionListener="#{usersession.createDocument()}" value="Guardar" />
+                            <p:commandButton value="Limpiar" type="button" onclick="miEditor.clear();" update=":frmeditor"/>
+                        </h:panelGrid>
+                    </h:form>
                 </p:dialog>
             </ui:define>
             <ui:define name="bottom">
