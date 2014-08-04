@@ -4,6 +4,11 @@
  */
 package com.siat.stcloud.beans.session;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.html.simpleparser.HTMLWorker;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.siat.stcloud.dao.DAOArchivo;
 import com.siat.stcloud.dao.DAOCarpeta;
 import com.siat.stcloud.dao.DAOUsuario;
@@ -16,9 +21,11 @@ import com.siat.stcloud.utils.Zip;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -62,6 +69,8 @@ public class SUsuarioBean implements Serializable {
     /*Objeto de descarga*/
     private StreamedContent file;
     private String editor;
+    /*Nombre de los archivos creados por el usuario*/
+    private String tituloEditor;
 
     public SUsuarioBean() {
         HttpSession miSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
@@ -270,16 +279,16 @@ public class SUsuarioBean implements Serializable {
 
     public void downloadZIPFolder() {
         String origen = this.carpeta.getCptRuta();
-        String destino = origen.substring(0,origen.lastIndexOf("\\"))+"\\"+this.carpeta.getCptNombre()+".zip";
-        Zip z = new Zip(origen,destino);
+        String destino = origen.substring(0, origen.lastIndexOf("\\")) + "\\" + this.carpeta.getCptNombre() + ".zip";
+        Zip z = new Zip(origen, destino);
         z.create();
         File f = new File(destino);
-        try{
+        try {
             InputStream input = new FileInputStream(f);
             ExternalContext container = FacesContext.getCurrentInstance().getExternalContext();
             this.file = new DefaultStreamedContent(input, container.getMimeType(f.getName()), f.getName());
             f.delete();
-        }catch(Exception err){
+        } catch (Exception err) {
             this.showMessage("Problemas al descargar", "Consulta con tu administrador. Error tipo: " + err.getMessage(), FacesMessage.SEVERITY_WARN);
         }
     }
@@ -314,7 +323,7 @@ public class SUsuarioBean implements Serializable {
             return;
         }
         if (nombreArchivo.startsWith("-") || nombreArchivo.startsWith("_") || Pattern.matches("[0-9]*", nombreArchivo.substring(0, 1))) {
-            this.showMessage("Nombre innválido", "El nombre debe comenzar con letra", FacesMessage.SEVERITY_WARN);
+            this.showMessage("Nombre inválido", "El nombre debe comenzar con letra", FacesMessage.SEVERITY_WARN);
             return;
         }
         try {
@@ -407,10 +416,54 @@ public class SUsuarioBean implements Serializable {
         FacesMessage mensaje = new FacesMessage(severidad, titulo, detalle);
         fc.addMessage(null, mensaje);
     }
-    
-    public void createDocument(){
-        System.out.println(this.editor);
-        this.editor=null;
+
+    public void createDocument() {
+        if (this.tituloEditor.trim().length() <= 0) {
+            this.showMessage("Archivo sin nombre", "Asignale un nombre a este archivo por favor", FacesMessage.SEVERITY_WARN);
+            return;
+        }
+        if (this.tituloEditor.startsWith("-") || this.tituloEditor.startsWith("_") || Pattern.matches("[0-9]*", this.tituloEditor.substring(0, 1))) {
+            this.showMessage("Nombre inválido", "El nombre debe comenzar con letra", FacesMessage.SEVERITY_WARN);
+            return;
+        }
+        this.tituloEditor = this.tituloEditor.trim()+".pdf";
+        try {
+            this.session = HibernateUtil.getSessionFactory().openSession();
+            this.transaccion = session.beginTransaction();
+            Archivo tmp = daoArchivo.getFileByName(tituloEditor, this.carpeta, this.session);
+            if (tmp != null) {
+                showMessage("El archivo ya existe!!", "Parece que el archivo ya existe. Por favor asigna otro nombre", FacesMessage.SEVERITY_WARN);
+                transaccion.rollback();
+                return;
+            }
+            String html = this.editor;
+            Document document = new Document(PageSize.LETTER);
+            PdfWriter.getInstance(document, new FileOutputStream(carpeta.getCptRuta() + "/" + this.tituloEditor));
+            document.open();
+            document.addAuthor(System.getProperty("user.name"));
+            document.addCreator(System.getProperty("user.name"));
+            document.addSubject("Archivo creado en STCloud. SIAT 2014");
+            document.addCreationDate();
+            document.addTitle(this.tituloEditor);
+            HTMLWorker htmlWorker = new HTMLWorker(document);
+            htmlWorker.parse(new StringReader(html));
+            document.close();
+            tmp = new Archivo(this.carpeta,tituloEditor,new Date(),this.carpeta.getCptRuta()+"\\"+this.tituloEditor);
+            daoArchivo.createFile(tmp, this.session);
+            showMessage("Archivo creado", "El archivo " + this.tituloEditor + " ha sido creado satisfactoriamente", FacesMessage.SEVERITY_INFO);
+            this.transaccion.commit();
+        } catch (Exception err) {
+            showMessage("Ha ocurrido un error", "El archivo no pudo ser creado. Consulte con su administrador sobre el error" + err.getMessage(), FacesMessage.SEVERITY_FATAL);
+            if (this.transaccion!=null){
+                this.transaccion.rollback();
+            }
+        }
+        finally{
+            if (this.session!=null){
+                this.session.disconnect();
+            }
+        }
+        this.editor = null;
     }
 
     /**
@@ -602,5 +655,17 @@ public class SUsuarioBean implements Serializable {
      */
     public void setEditor(String editor) {
         this.editor = editor;
+    }
+
+    public String getTituloEditor() {
+        return tituloEditor;
+    }
+    
+    public void setTituloEditor(String tituloEditor) {
+        this.tituloEditor=tituloEditor;
+    }
+
+    public void setNombreArchivo(String tituloEditor) {
+        this.tituloEditor = tituloEditor;
     }
 }

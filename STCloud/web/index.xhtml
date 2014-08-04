@@ -40,7 +40,7 @@
                         <p:menuitem oncomplete="updFoldDialog.show();" value="Renombrar" icon="ui-icon-pencil" />
                     </p:contextMenu>
                     <!-- Muestra todas las carpetas del usuario -->
-                    <p:dataTable  id="tablaCarpeta" var="item" value="#{usersession.carpetasUsuarios}" rows="5" selectionMode="single" selection="#{usersession.carpeta}" rowKey="#{item.idCarpeta}" filteredValue="#{usersession.carpetaSeleccion}">
+                    <p:dataTable  id="tablaCarpeta" var="item" value="#{usersession.carpetasUsuarios}" paginator="true" rows="5" selectionMode="single" selection="#{usersession.carpeta}" rowKey="#{item.idCarpeta}" filteredValue="#{usersession.carpetaSeleccion}">
                         <p:ajax event="rowSelect" onsuccess="userDialog.show();" update=":file:tablaArchivo" /> 
                         <p:column headerText="Nombre"  filterBy="cptNombre">
                             <h:outputText value="#{item.cptNombre}" />
@@ -48,7 +48,7 @@
                         <p:column headerText="Fecha de creación" filterBy="cptFechaCreacion" >
                             <h:outputText value="#{item.cptFechaCreacion}" />
                         </p:column>                        
-                        <p:column headerText="Ruta" filterBy="ruta" >
+                        <p:column headerText="Ruta" filterBy="cptRuta" >
                             <h:outputText value="#{item.cptRuta}" />
                         </p:column>
                     </p:dataTable>                   
@@ -130,13 +130,13 @@
                         </h:form>
                     </h:panelGrid>
                 </p:dialog>
-                <!-- Muestra un dialogo para renombrar una carpeta -->
+                <!-- Muestra un dialogo para renombrar un archivo -->
                 <p:dialog widgetVar="updFileDialog" resizable="false" position="center"  header="Modificacion de un archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
                     <h:panelGrid id="updFile" columns="2">
                         <h:form id="frmupdFle">
                             <p:outputLabel value="Nuevo nombre del archivo"/>                        
                             <p:inputText onkeypress="return rename(event);" value="#{usersession.addArchivo.nombre}" required="true" requiredMessage="Este campo es obligatorio" maxlength="20"/>
-                            <p:commandButton actionListener="#{usersession.updateFile()}" value="Crear" update=":listContainer,:frmupdFle,:file:tablaArchivo" oncomplete="updFileDialog.hide();" icon="ui-icon-plus" />
+                            <p:commandButton actionListener="#{usersession.updateFile()}" value="Renombrar" update=":listContainer,:frmupdFle,:file:tablaArchivo" oncomplete="updFileDialog.hide();" icon="ui-icon-plus" />
                         </h:form>
                     </h:panelGrid>
                 </p:dialog>
@@ -149,16 +149,26 @@
                         </h:form>
                     </h:panelGrid>
                 </p:dialog>
+
+                <p:dialog widgetVar="writeDialog" resizable="false" position="center" header="Nombre del archivo" appendTo="@(body)" showEffect="explode" modal="true" closable="true" draggable="true" closeOnEscape="true">
+                    <h:form id="docForm">
+                        <p:outputLabel value="Escribe el nombre del archivo" />
+                        <p:inputText value="#{usersession.tituloEditor}" onkeypress="return rename(event);"  required="true" requiredMessage="Este campo es obligatorio"  maxlength="50" />
+                        <p:commandButton actionListener="#{usersession.createDocument()}" value="Crear Archivo" update=":listContainer,:docForm,:file:tablaArchivo" oncomplete="writeDialog.hide();"  icon="ui-icon-disk" />
+                    </h:form>
+                </p:dialog>
+
                 <!-- Muestra un dialogo para escribir texto con formato -->
                 <p:dialog widgetVar="editorDialog" resizable="false" position="center"  header="Subir un nuevo archivo" appendToBody="true" showEffect="explode" modal="true" closable="true" draggable="false" closeOnEscape="true">
                     <h:form id="frmeditor">
                         <p:editor id="editor" widgetVar="miEditor" value="#{usersession.editor}" width="600" />
                         <h:panelGrid id="editorText" columns="2">
-                            <p:commandButton actionListener="#{usersession.createDocument()}" value="Guardar" />
+                            <p:commandButton value="Guardar" oncomplete="writeDialog.show();"  icon="ui-icon-disk" />
                             <p:commandButton value="Limpiar" type="button" onclick="miEditor.clear();" update=":frmeditor"/>
-                        </h:panelGrid>
+                        </h:panelGrid>                        
                     </h:form>
                 </p:dialog>
+                
             </ui:define>
             <ui:define name="bottom">
             </ui:define>
