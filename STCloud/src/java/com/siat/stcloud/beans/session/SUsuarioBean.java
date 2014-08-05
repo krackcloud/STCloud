@@ -286,8 +286,7 @@ public class SUsuarioBean implements Serializable {
         try {
             InputStream input = new FileInputStream(f);
             ExternalContext container = FacesContext.getCurrentInstance().getExternalContext();
-            this.file = new DefaultStreamedContent(input, container.getMimeType(f.getName()), f.getName());
-            f.delete();
+            this.file = new DefaultStreamedContent(input, container.getMimeType(f.getName()), f.getName());            
         } catch (Exception err) {
             this.showMessage("Problemas al descargar", "Consulta con tu administrador. Error tipo: " + err.getMessage(), FacesMessage.SEVERITY_WARN);
         }
